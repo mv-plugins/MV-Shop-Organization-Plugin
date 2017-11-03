@@ -1,12 +1,18 @@
 /*:
- * @plugindesc v1.0 Organizes the Buy window of the shop in different categories.
+ * @plugindesc v1.1 Organizes the Buy window of the shop in different categories.
  * @author FeelZoR
+ * 
  * @param Categories
  * @desc The list of Categories. Separate each category with a ';'.
- * Leave blank to use no category (then why would you install the plugin?).
- * eg: Weapons;Potions;Others will create three categories: Weapons, Potions and Others.
+ * Leave blank to use no category.
+ * 
  * @param Default Category
  * @desc The default category if the item has no data. Leave blank to use first category.
+ * 
+ * @param Maximum Categories on One Line
+ * @desc Sets the maximum number of categories shown at once, in the shop.
+ * @default 4
+ * 
  * @help ===================== Shop Organization v1.0 by FeelZoR =====================
  * Free to use for any project - Commercial or Non-Commercial.
  * No Credits required, but highly appreciated.
@@ -27,6 +33,7 @@
 parameters = PluginManager.parameters('ShopOrganization');
 FLZ_Shop_Categories = String(parameters['Categories'] || '').split(';');
 FLZ_Default_Category = String(parameters['Default Category'] || FLZ_Shop_Categories[0] || '');
+FLZ_Max_Number_Categories_One_Line = Number(parameters['Maximum Categories on One Line'] || 4);
 
 if (FLZ_Shop_Categories != '') { 
 
@@ -151,7 +158,7 @@ Window_BuyItemCategory.prototype.windowWidth = function() {
 };
 
 Window_BuyItemCategory.prototype.maxCols = function() {
-    return Math.min(4, FLZ_Shop_Categories.length);
+    return Math.min(FLZ_Max_Number_Categories_One_Line, FLZ_Shop_Categories.length);
 };
 
 Window_BuyItemCategory.prototype.update = function() {
@@ -166,6 +173,13 @@ Window_BuyItemCategory.prototype.makeCommandList = function() {
 		this.addCommand(FLZ_Shop_Categories[category], FLZ_Shop_Categories[category]);
 	}
 };
+
+Window_BuyItemCategory.prototype.drawItem = function(index) {
+    var rect = this.itemRectForText(index);
+    this.resetTextColor();
+    this.changePaintOpacity(this.isCommandEnabled(index));
+    this.drawTextEx(this.commandName(index), rect.x, rect.y);
+}
 
 Window_BuyItemCategory.prototype.setItemWindow = function(itemWindow) {
     this._itemWindow = itemWindow;
